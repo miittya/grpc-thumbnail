@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package thumbnail;
+
+option go_package = "miittya.thumbnail.v1;thumbnailv1";
+
+service thumbnailService {
+  rpc Thumbnail (ThumbnailRequest) returns (ThumbnailResponse);
+}
+
+message ThumbnailRequest {
+  string video_url = 1;
+}
+
+message ThumbnailResponse {
+  bytes thumbnail_data = 1;
+}

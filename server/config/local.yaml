@@ -1,0 +1,5 @@
+env: "local"
+storage_path: "../storage/thumbnail.db"
+grpc:
+  port: 8080
+  timeout: 10h
