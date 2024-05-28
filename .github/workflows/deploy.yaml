@@ -30,7 +30,7 @@ jobs:
       - name: Start server
         run : |
           go build -o server ./server/cmd/grpc-thumbnail
-          ./server --config=./server/config/local.yaml &
+          ./server/grpc-thumbnail --config=./server/config/local.yaml &
 
       - name: Run black box tests
         run: go test -v ./server/tests
