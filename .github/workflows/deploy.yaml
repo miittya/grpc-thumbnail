@@ -22,23 +22,21 @@ jobs:
       - name: Install dependencies
         run: go mod tidy
 
-      - name: Build server
+      - name: Run unit tests
         run: |
           cd server
-          go build -v ./cmd/grpc-thumbnail
+          go test -v ./internal/...
 
-      - name: Test server
-        run: |
-          cd server
-          go test -v ./...
+      - name: Start server
+        run : |
+          go build -o server ./server/cmd/grpc-thumbnail
+          ./server &
 
-      - name: Build client
-        run: |
-          cd client
-          go build -v ./cmd/grpc-thumbnail
+      - name: Run black box tests
+        run: go test -v ./server/tests
 
-      - name: Test client
-        run: |
-          cd client
-          go test -v ./...
+      - name: Stop server
+        run: killall server
+        if: success() || failure()
+
 
