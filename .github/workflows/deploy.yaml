@@ -29,6 +29,8 @@ jobs:
 
       - name: Start server
         run : |
+          mkdir -p storage
+          make migrate
           go build -o server ./server/cmd/grpc-thumbnail
           ./server/grpc-thumbnail --config=./server/config/local.yaml &
 
