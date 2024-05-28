@@ -92,7 +92,6 @@ func extractVideoID(videoURL string) (string, error) {
 	queryParams := parsedURL.Query()
 	videoID := queryParams.Get("v")
 	if videoID == "" {
-		// Попробуем обработать сокращенные URL, например, youtu.be/dQw4w9WgXcQ
 		if parsedURL.Host == "youtu.be" {
 			videoID = strings.TrimPrefix(parsedURL.Path, "/")
 		}

@@ -15,11 +15,13 @@ type ThumbnailService struct {
 	storage  Storage
 }
 
+//go:generate go run github.com/vektra/mockery/v2@v2.43.0 --name=Storage
 type Storage interface {
 	SaveThumbnail(ctx context.Context, videoURL string, thumbnail []byte) error
 	Thumbnail(ctx context.Context, videoURL string) ([]byte, error)
 }
 
+//go:generate go run github.com/vektra/mockery/v2@v2.43.0 --name=Client
 type Client interface {
 	Thumbnail(ctx context.Context, videoURL string) ([]byte, error)
 }
@@ -50,6 +52,9 @@ func (s *ThumbnailService) Thumbnail(ctx context.Context, videoURL string) ([]by
 	thumbnail, err := s.storage.Thumbnail(ctx, videoURL)
 	if err != nil {
 		if !errors.Is(err, storage.ErrNotFound) {
+			log.Info(err.Error())
+			log.Info(storage.ErrNotFound.Error())
+			log.Info("hui", slog.Bool("hui", errors.Is(err, storage.ErrNotFound)))
 			log.Error("failed to get thumbnail from db", sl.Err(err))
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}
@@ -59,7 +64,7 @@ func (s *ThumbnailService) Thumbnail(ctx context.Context, videoURL string) ([]by
 		thumbnail, err = s.ytClient.Thumbnail(ctx, videoURL)
 		if err != nil {
 			log.Error("failed to fetch thumbnail from youtube", sl.Err(err))
-			return nil, fmt.Errorf("%s: %w", op, err)
+			return nil, fmt.Errorf("%s: %w", "failed to fetch thumbnail from youtube", err)
 		}
 
 		log.Info("successfully fetched thumbnail from youtube")
@@ -67,8 +72,7 @@ func (s *ThumbnailService) Thumbnail(ctx context.Context, videoURL string) ([]by
 
 		err = s.storage.SaveThumbnail(ctx, videoURL, thumbnail)
 		if err != nil {
-			log.Error("failed to save thumbnail in cache", sl.Err(err))
-			return nil, fmt.Errorf("%s: %w", op, err)
+			log.Warn("failed to save thumbnail in cache", sl.Err(err))
 		}
 	}
 	return thumbnail, nil

@@ -24,7 +24,7 @@ var videoIDRegex = regexp.MustCompile(`(?:v=|\/)([0-9A-Za-z_-]{10}[048AEIMQUYcgk
 func extractVideoID(videoURL string) (string, error) {
 	matches := videoIDRegex.FindStringSubmatch(videoURL)
 	if len(matches) < 2 {
-		return "", fmt.Errorf("invalid video URL: %s", videoURL)
+		return "", fmt.Errorf("invalid video url: %s", videoURL)
 	}
 	return matches[1], nil
 }

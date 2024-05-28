@@ -8,8 +8,15 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"net/url"
+	"regexp"
 )
 
+// Regular expression for validating YouTube video ID
+var (
+	videoIDRegex = regexp.MustCompile(`^[a-zA-Z0-9_-]{11}$`)
+)
+
+//go:generate go run github.com/vektra/mockery/v2@v2.43.0 --name=ThumbnailService
 type ThumbnailService interface {
 	Thumbnail(ctx context.Context, videoURL string) ([]byte, error)
 }
@@ -40,9 +47,20 @@ func (s *serverAPI) Thumbnail(
 }
 
 func validateURL(videoURL string) error {
-	_, err := url.ParseRequestURI(videoURL)
+	parsedURL, err := url.ParseRequestURI(videoURL)
 	if err != nil {
 		return errors.New("invalid video url")
+	}
+
+	if parsedURL.Host != "www.youtube.com" && parsedURL.Host != "youtube.com" {
+		return errors.New("invalid video url")
+	}
+
+	queryParams := parsedURL.Query()
+	videoID := queryParams.Get("v")
+
+	if !videoIDRegex.MatchString(videoID) {
+		return errors.New("invalid video id")
 	}
 	return nil
 }

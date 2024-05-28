@@ -3,10 +3,12 @@ package app
 import (
 	grpcapp "github.com/miittya/grpc-thumbnail/server/internal/app/grpc"
 	"github.com/miittya/grpc-thumbnail/server/internal/clients/yt"
+	"github.com/miittya/grpc-thumbnail/server/internal/lib/sl"
 	"github.com/miittya/grpc-thumbnail/server/internal/services/thumbnail"
 	"github.com/miittya/grpc-thumbnail/server/internal/storage/sqlite"
 	"log/slog"
 	"net/http"
+	"os"
 )
 
 type App struct {
@@ -20,7 +22,8 @@ func New(
 ) *App {
 	storage, err := sqlite.New(storagePath)
 	if err != nil {
-		panic("failed to open storage")
+		log.Error("Failed to open storage", sl.Err(err))
+		os.Exit(1)
 	}
 
 	client := yt.New(http.DefaultClient)

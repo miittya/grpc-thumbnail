@@ -20,6 +20,9 @@ func New(storagePath string) (*Storage, error) {
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
+	if err := db.Ping(); err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
 	return &Storage{db: db}, nil
 }
 
@@ -31,12 +34,13 @@ func (s *Storage) Stop() error {
 func (s *Storage) SaveThumbnail(ctx context.Context, videoURL string, thumbnail []byte) error {
 	op := "storage.sqlite.SaveThumbnail"
 
-	stmt, err := s.db.Prepare("INSERT INTO thumbnails (video_url, thumbnail) VALUES (?, ?)")
-	if err != nil {
-		return fmt.Errorf("%s: %w", op, err)
-	}
+	_, err := s.db.ExecContext(
+		ctx,
+		"INSERT INTO thumbnails (video_url, thumbnail) VALUES (?, ?)",
+		videoURL,
+		string(thumbnail),
+	)
 
-	_, err = stmt.ExecContext(ctx, videoURL, string(thumbnail))
 	if err != nil {
 		var sqliteErr sqlite3.Error
 		if errors.As(err, &sqliteErr) && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {

@@ -1,5 +1,5 @@
 env: "local"
-storage_path: "../storage/thumbnail.db"
+storage_path: "./storage/thumbnail.db"
 grpc:
-  port: 8080
+  port: 8088
   timeout: 10h
