@@ -32,9 +32,14 @@ func TestThumbnail_FailCases(t *testing.T) {
 			expectedErr: "invalid video url",
 		},
 		{
-			name:        "invalid video url",
-			videoURL:    "https://www.youtube.com/watch?v=-1",
+			name:        "invalid host",
+			videoURL:    "www.google.com",
 			expectedErr: "invalid video url",
+		},
+		{
+			name:        "invalid video id",
+			videoURL:    "https://www.youtube.com/watch?v=-1",
+			expectedErr: "invalid video id",
 		},
 	}
 
