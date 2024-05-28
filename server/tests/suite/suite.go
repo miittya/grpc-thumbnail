@@ -9,6 +9,7 @@ import (
 	"net"
 	"strconv"
 	"testing"
+	"time"
 )
 
 type Suite struct {
@@ -18,7 +19,9 @@ type Suite struct {
 }
 
 const (
-	grpcHost = "localhost"
+	grpcHost         = "localhost"
+	maxRetryAttempts = 10
+	retryDelay       = 2 * time.Second
 )
 
 func New(t *testing.T) (context.Context, *Suite) {
@@ -34,12 +37,22 @@ func New(t *testing.T) (context.Context, *Suite) {
 		cancelCtx()
 	})
 
-	cc, err := grpc.NewClient(
-		net.JoinHostPort(grpcHost, strconv.Itoa(cfg.GRPC.Port)),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
+	var cc *grpc.ClientConn
+	var err error
+	for att := 0; att < maxRetryAttempts; att++ {
+		cc, err = grpc.NewClient(
+			net.JoinHostPort(grpcHost, strconv.Itoa(cfg.GRPC.Port)),
+			grpc.WithTransportCredentials(insecure.NewCredentials()),
+		)
+		if err == nil {
+			break
+		}
+		t.Logf("grpc server connection attempt %d failed: %v", att+1, err)
+		time.Sleep(retryDelay)
+	}
+
 	if err != nil {
-		t.Fatalf("grpc server connection failed: %v", err)
+		t.Fatalf("grpc server connection failed after %d attempts: %v", maxRetryAttempts, err)
 	}
 
 	return ctx, &Suite{
