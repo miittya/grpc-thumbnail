@@ -37,8 +37,4 @@ jobs:
       - name: Run black box tests
         run: go test -v ./server/tests
 
-      - name: Stop server
-        run: killall server
-        if: success() || failure()
-
 
