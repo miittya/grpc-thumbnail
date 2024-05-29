@@ -1,7 +1,7 @@
 # gRPC Thumbnail Proxy Service
 ## Сборка и запуск сервера
 `go run ./server/cmd/grpc-thumbnail --config=./server/config/local.yaml`
-### При первом запуске необходимо сначала применить миграции!
+### При первом запуске необходимо применить миграции
 `make migrate`
 
 Или:
