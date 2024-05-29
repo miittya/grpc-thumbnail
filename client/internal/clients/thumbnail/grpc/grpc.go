@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 )
@@ -68,10 +69,15 @@ func saveThumbnail(videoURL string, thumbnail []byte) error {
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(fileName, thumbnail, 0644)
-	if err != nil {
+	dir := "./thumbnails"
+	if err := os.MkdirAll(dir, 0777); err != nil {
 		return err
 	}
+	filePath := filepath.Join(dir, fileName)
+	if err := os.WriteFile(filePath, thumbnail, 0644); err != nil {
+		return err
+	}
+
 	return nil
 }
 

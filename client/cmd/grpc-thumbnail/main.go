@@ -16,7 +16,7 @@ func main() {
 		log.Fatal("no video url provided")
 	}
 
-	client, err := grpcclient.New("localhost:8080")
+	client, err := grpcclient.New("localhost:8088")
 	if err != nil {
 		log.Fatal(err)
 	}

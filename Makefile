@@ -1,6 +1,7 @@
 .SILENT:
 
 migrate:
+	mkdir storage
 	go run ./server/cmd/migrator --storage-path=./storage/thumbnail.db --migrations-path=./server/migrations
 
 generate-proto:
